@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Router } from 'express';
 
+import { BadRequestError } from '../utils/errors';
+
 const router = Router();
 
 router.get('/', async (req, res) => {
@@ -15,11 +17,11 @@ router.get('/:messageId', async (req, res) => {
   return res.send(message);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
   const message = await req.context.models.Message.create({
     text: req.body.text,
     userId: req.context.me.id,
-  });
+  }).catch((error) => next(new BadRequestError(error)));
 
   return res.send(message);
 });
